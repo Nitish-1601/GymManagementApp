@@ -1,19 +1,16 @@
 package com.ufit.gymmanagementsystem.model;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.io.Serializable;
 
-@Builder
+
 public class UserPk implements Serializable {
-    private String id;
+    private String email;
 
-
-    public UserPk(){
+    public UserPk() {
 
     }
-    public UserPk(String s) {
-        this.id = s;
+
+    public UserPk(String email) {
+        this.email = email;
     }
 }

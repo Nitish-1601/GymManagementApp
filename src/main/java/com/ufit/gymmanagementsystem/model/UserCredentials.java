@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "user_credentials")
 @IdClass(UserPk.class)
-public class UserCredentials {
+public class    UserCredentials {
     @Id
     private String email;
     private String password;
@@ -22,7 +22,15 @@ public class UserCredentials {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
