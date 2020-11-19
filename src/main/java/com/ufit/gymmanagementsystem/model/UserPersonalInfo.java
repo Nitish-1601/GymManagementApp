@@ -14,12 +14,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "user_personal_info")
 @IdClass(UserPk.class)
-public class UserInfo {
+public class UserPersonalInfo {
     @Id
     private String email;
     private String firstName;
     private String lastName;
-    private String password;
     private int age;
     private String phoneNumber;
 
@@ -46,14 +45,6 @@ public class UserInfo {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhoneNumber() {
