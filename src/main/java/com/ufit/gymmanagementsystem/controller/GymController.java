@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sun.security.util.Password;
 
+import java.util.Optional;
+
 
 @Controller
 public class GymController {
@@ -30,10 +32,8 @@ public class GymController {
 
     @GetMapping("/register")
     public String register() {
-
         return "registration.html";
     }
-
 
     @GetMapping("/login")
     public String login() {
@@ -43,9 +43,6 @@ public class GymController {
 
     @PostMapping("/save-user")
     public ResponseEntity<?> insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials) {
-//        if (userPersonalInfo.getFirstName() == null || userPersonalInfo.getFirstName().equals("")) {
-//            throw new IllegalStateException("Something went wrong");
-//        }
         userRegistrationRepo.save(userRegistration);
         userPersonalInfoRepo.save(userPersonalInfo);
         userCredentialsRepo.save(userCredentials);
@@ -55,10 +52,15 @@ public class GymController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> fetchAndVerify(LoginVerifier loginVerifier ) {
+        Optional<UserCredentials> validate = userServices.findId(loginVerifier.getEmail());
+        if(validate.isPresent()) {
             if (userServices.getById(loginVerifier.getEmail()).getPassword().equals(loginVerifier.getPassword()))
                 return ResponseEntity.ok("hi!! you are logged in");
             else
                 return ResponseEntity.ok("Username or Password not correct");
+        }
+        else
+            return ResponseEntity.ok("Username or Password not correct");
 
 
     }

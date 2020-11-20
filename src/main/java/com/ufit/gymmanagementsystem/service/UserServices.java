@@ -6,6 +6,8 @@ import com.ufit.gymmanagementsystem.repo.UserCredentialsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserServices {
 
@@ -15,5 +17,9 @@ public class UserServices {
     public UserCredentials getById(String id)
     {
         return userCredentialsRepo.getOne(new UserPk(id));
+    }
+    public Optional<UserCredentials> findId(String id)
+    {
+        return userCredentialsRepo.findById(new UserPk(id));
     }
 }

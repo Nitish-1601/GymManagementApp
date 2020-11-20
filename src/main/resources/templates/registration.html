@@ -13,13 +13,13 @@
     <body id="registration">
         <div class="login-page">
             <div class="form">
-                <form class="register-form" action="/save-user" method="POST">
-                    <input type="text" placeholder="first name" name="firstName"/>
-                    <input type="text" placeholder="last name" name="lastName"/>
-                    <input type="password" placeholder="password" name="password"/>
-                    <input type="text" placeholder="age" name="age"/>
-                    <input type="text" placeholder="email id" name="email"/>
-                    <input type="text" placeholder="phone number" name="phoneNumber"/>
+                <form class="register-form" action="/save-user" method="POST" required>
+                    <input type="text" placeholder="first name" name="firstName" required/>
+                    <input type="text" placeholder="last name" name="lastName" required/>
+                    <input type="password" placeholder="password" name="password" required/>
+                    <input type="text" placeholder="age" name="age" required/>
+                    <input type="text" placeholder="email id" name="email" required/>
+                    <input type="text" placeholder="phone number" name="phoneNumber" required/>
                     <button>Register</button>
                     <p class="message">Already Registered? <a href="/login">Login</a></p>
                 </form>
