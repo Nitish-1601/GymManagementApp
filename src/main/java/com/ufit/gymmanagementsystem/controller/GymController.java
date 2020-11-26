@@ -57,15 +57,20 @@ public class GymController {
 
 
     @PostMapping("/save-user")
-    public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials) {
+    public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials,LoginVerifier loginVerifier) {
 
-        String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
-        userRegistration.setPassword(encodedPassword);
-        userCredentials.setPassword(encodedPassword);
-        userRegistrationRepo.save(userRegistration);
-        userPersonalInfoRepo.save(userPersonalInfo);
-        userCredentialsRepo.save(userCredentials);
-        return "registerSuccessful";
+        Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
+        if(!optionalUserCredentials.isPresent()) {
+            String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
+            userRegistration.setPassword(encodedPassword);
+            userCredentials.setPassword(encodedPassword);
+            userRegistrationRepo.save(userRegistration);
+            userPersonalInfoRepo.save(userPersonalInfo);
+            userCredentialsRepo.save(userCredentials);
+            return "registerSuccessful";
+        }
+        return "registration_Fail";
+
 
     }
 
