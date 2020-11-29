@@ -4,6 +4,7 @@ import com.ufit.gymmanagementsystem.model.*;
 import com.ufit.gymmanagementsystem.repo.UserCredentialsRepo;
 import com.ufit.gymmanagementsystem.repo.UserPersonalInfoRepo;
 import com.ufit.gymmanagementsystem.repo.UserRegistrationRepo;
+import com.ufit.gymmanagementsystem.service.EmailService;
 import com.ufit.gymmanagementsystem.service.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Optional;
 
 
@@ -26,6 +29,8 @@ public class GymController {
     private UserCredentialsRepo userCredentialsRepo;
     @Autowired
     private UserServices userServices;
+    @Autowired
+    EmailService emailService;
 
     @GetMapping("/")
     public String home() {
@@ -57,7 +62,7 @@ public class GymController {
 
 
     @PostMapping("/save-user")
-    public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials,LoginVerifier loginVerifier) {
+    public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials,LoginVerifier loginVerifier) throws IOException, MessagingException {
 
         Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
         if(!optionalUserCredentials.isPresent()) {
@@ -67,6 +72,7 @@ public class GymController {
             userRegistrationRepo.save(userRegistration);
             userPersonalInfoRepo.save(userPersonalInfo);
             userCredentialsRepo.save(userCredentials);
+            emailService.send(userPersonalInfo);
             return "registerSuccessful";
         }
         return "registration_Fail";
