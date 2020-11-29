@@ -12,3 +12,13 @@ spring:
     show-sql: true
     generate-ddl: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# Mail
+  spring.mail.host: smtp.gmail.com
+  spring.mail.port: 587
+  spring.mail.username: ufitgym8427@gmail.com
+  spring.mail.password: N.sharma@1999
+  spring.mail.properties.mail.smtp.starttls.enable: true
+  spring.mail.properties.mail.transport.protocol: smtp
+  spring.mail.properties.mail.smtp.auth: true
+  spring.mail.setTLS: true

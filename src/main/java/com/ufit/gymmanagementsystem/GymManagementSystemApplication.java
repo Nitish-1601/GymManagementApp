@@ -12,4 +12,5 @@ public class GymManagementSystemApplication {
 		SpringApplication.run(GymManagementSystemApplication.class, args);
 	}
 
+
 }
