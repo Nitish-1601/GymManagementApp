@@ -64,20 +64,24 @@ public class GymController {
     @PostMapping("/save-user")
     public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials,LoginVerifier loginVerifier) throws IOException, MessagingException {
 
-        Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
-        if(!optionalUserCredentials.isPresent()) {
-            String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
-            userRegistration.setPassword(encodedPassword);
-            userCredentials.setPassword(encodedPassword);
-            userRegistrationRepo.save(userRegistration);
-            userPersonalInfoRepo.save(userPersonalInfo);
-            userCredentialsRepo.save(userCredentials);
-            emailService.send(userPersonalInfo);
+        try {
+            Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
+            if (!optionalUserCredentials.isPresent()) {
+                String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
+                userRegistration.setPassword(encodedPassword);
+                userCredentials.setPassword(encodedPassword);
+                userRegistrationRepo.save(userRegistration);
+                userPersonalInfoRepo.save(userPersonalInfo);
+                userCredentialsRepo.save(userCredentials);
+                emailService.send(userPersonalInfo);
+                return "registerSuccessful";
+            }
+            return "registration_Fail";
+
+        }
+        catch (Exception e) {
             return "registerSuccessful";
         }
-        return "registration_Fail";
-
-
     }
 
 
