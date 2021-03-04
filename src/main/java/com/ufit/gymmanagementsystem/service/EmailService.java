@@ -15,15 +15,13 @@ import java.io.IOException;
 public class EmailService {
     @Autowired
     JavaMailSender javaMailSender;
-    @Autowired
-    UserPersonalInfoRepo userPersonalInfoRepo;
 
-    public void send(UserPersonalInfo userPersonalInfo) throws AddressException, MessagingException, IOException {
+    public void send(UserPersonalInfo userPersonalInfo)  {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("ufitgym8427@gmail.com");
         message.setTo(userPersonalInfo.getEmail());
-        message.setSubject("Registration Confirm");
+        message.setSubject("Registration Confirmation");
         message.setText("Welcome " + userPersonalInfo.getFirstName() + " We’re excited you’ve joined U-fit");
         javaMailSender.send(message);
     }
