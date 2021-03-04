@@ -1,24 +1,26 @@
 package com.ufit.gymmanagementsystem.controller;
 
-import com.ufit.gymmanagementsystem.model.*;
+import com.ufit.gymmanagementsystem.model.UserCredentials;
+import com.ufit.gymmanagementsystem.model.UserPersonalInfo;
+import com.ufit.gymmanagementsystem.model.UserRegistration;
 import com.ufit.gymmanagementsystem.repo.UserCredentialsRepo;
 import com.ufit.gymmanagementsystem.repo.UserPersonalInfoRepo;
 import com.ufit.gymmanagementsystem.repo.UserRegistrationRepo;
 import com.ufit.gymmanagementsystem.service.EmailService;
-import com.ufit.gymmanagementsystem.service.UserServices;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.Optional;
 
-
+@Slf4j
 @Controller
 public class GymController {
+    @Autowired
+    EmailService emailService;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
@@ -27,10 +29,6 @@ public class GymController {
     private UserPersonalInfoRepo userPersonalInfoRepo;
     @Autowired
     private UserCredentialsRepo userCredentialsRepo;
-    @Autowired
-    private UserServices userServices;
-    @Autowired
-    EmailService emailService;
 
     @GetMapping("/")
     public String home() {
@@ -46,10 +44,12 @@ public class GymController {
     public String register() {
         return "registration";
     }
+
     @GetMapping("/diet")
     public String diet() {
         return "diet";
     }
+
     @GetMapping("/login_fail")
     public String login_fail() {
         return "login_fail";
@@ -62,43 +62,37 @@ public class GymController {
 
 
     @PostMapping("/save-user")
-    public String insertToDb(UserRegistration userRegistration ,UserPersonalInfo userPersonalInfo, UserCredentials userCredentials,LoginVerifier loginVerifier) throws IOException, MessagingException {
+    public String insertToDb(UserRegistration userRegistration) {
+        Optional<UserCredentials> optionalUserCredentials = userCredentialsRepo.findById(userRegistration.getEmail());
 
-        try {
-            Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
-            if (!optionalUserCredentials.isPresent()) {
-                String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
-                userRegistration.setPassword(encodedPassword);
-                userCredentials.setPassword(encodedPassword);
-                userRegistrationRepo.save(userRegistration);
-                userPersonalInfoRepo.save(userPersonalInfo);
-                userCredentialsRepo.save(userCredentials);
+        if (!optionalUserCredentials.isPresent()) {
+            String encodedPassword = bCryptPasswordEncoder.encode(userRegistration.getPassword());
+
+            userRegistration.setPassword(encodedPassword);
+            UserCredentials userCredentials = UserCredentials.builder()
+                    .email(userRegistration.getEmail())
+                    .password(encodedPassword)
+                    .build();
+
+            UserPersonalInfo userPersonalInfo = UserPersonalInfo.builder()
+                    .age(userRegistration.getAge())
+                    .firstName(userRegistration.getFirstName())
+                    .lastName(userRegistration.getLastName())
+                    .email(userRegistration.getEmail())
+                    .phoneNumber(userRegistration.getPhoneNumber())
+                    .build();
+            userRegistrationRepo.save(userRegistration);
+            userPersonalInfoRepo.save(userPersonalInfo);
+            userCredentialsRepo.save(userCredentials);
+            try {
                 emailService.send(userPersonalInfo);
-                return "registerSuccessful";
+            } catch (Exception e) {
+                log.error("Error while sending the registration confirmation mail to the user: {}", userPersonalInfo.getFirstName(), e);
             }
-            return "registration_Fail";
-
-        }
-        catch (Exception e) {
             return "registerSuccessful";
         }
+        log.info("The user with email: {} is already registered", userRegistration.getEmail());
+        return "registration_Fail";
     }
-
-
-     //    this is manual verifier not using spring security
-
-//    @PostMapping("/verify")
-//    public String fetchAndVerify(LoginVerifier loginVerifier ) {
-//        Optional<UserCredentials> optionalUserCredentials = userServices.findId(loginVerifier.getEmail());
-//        if(!optionalUserCredentials.isPresent()) {
-//            return "login_fail";
-//        }
-//        UserCredentials userCredentials = optionalUserCredentials.get();
-//
-//        if (!bCryptPasswordEncoder.matches(loginVerifier.getPassword(),userCredentials.getPassword())){
-//            return "login_fail";
-//        }
-//        return "/gym";
-//    }
 
 }
